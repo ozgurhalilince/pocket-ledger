@@ -1,0 +1,131 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.0'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'com.diffplug.spotless' version '6.25.0'
+	id 'jacoco'
+	id 'pmd'
+	id 'checkstyle'
+}
+
+group = 'pocket'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.0'
+	implementation 'net.datafaker:datafaker:2.1.0'
+
+	compileOnly 'org.projectlombok:lombok:1.18.32'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	annotationProcessor 'org.projectlombok:lombok:1.18.32'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-starter-validation'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testCompileOnly 'org.projectlombok:lombok:1.18.32'
+	testAnnotationProcessor 'org.projectlombok:lombok:1.18.32'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+spotless {
+	java {
+		googleJavaFormat('1.23.0').reflowLongStrings()
+		importOrder()
+		removeUnusedImports()
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+}
+
+jacoco {
+	toolVersion = '0.8.12'
+}
+
+jacocoTestReport {
+	dependsOn test
+	reports {
+		xml.required = true
+		html.required = true
+		csv.required = false
+	}
+	finalizedBy jacocoTestCoverageVerification
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			limit {
+				minimum = 0.80
+			}
+		}
+	}
+}
+
+pmd {
+	toolVersion = '7.0.0'
+	consoleOutput = true
+	ruleSetFiles = files('config/pmd/ruleset.xml')
+	ruleSets = []
+}
+
+pmdMain {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+pmdTest {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+checkstyle {
+	toolVersion = '10.17.0'
+	configFile = file('config/checkstyle/google_checks.xml')
+}
+
+checkstyleMain {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+checkstyleTest {
+	reports {
+		xml.required = true
+		html.required = true
+	}
+}
+
+task qualityCheck {
+	dependsOn 'spotlessCheck', 'pmdMain', 'pmdTest', 'checkstyleMain', 'checkstyleTest', 'test', 'jacocoTestReport'
+	description = 'Run all quality checks including code formatting, static analysis, and tests'
+	group = 'verification'
+}
+
+task formatCode {
+	dependsOn 'spotlessApply'
+	description = 'Apply Google Java Format to all Java files'
+	group = 'formatting'
+}
