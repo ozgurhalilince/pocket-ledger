@@ -103,18 +103,15 @@ src/main/java/pocket/ledger/
 ./gradlew build
 ```
 
-## Assignment Notes
+## Extra Notes
 
 This implementation goes beyond the "few hours" scope with comprehensive enhancements:
 
-### Core Assignment (3-4 hours)
+### Core
 
 - ✅ Basic API endpoints for money movements, balance, and transaction history
 - ✅ In-memory data structures with thread-safe operations
 - ✅ Functional web application with no external dependencies
-
-### Additional Quality Improvements
-
 - 🚀 **99% Test Coverage**: Comprehensive unit and integration tests
 - 🛡️ **Production-ready Error Handling**: Global exception handler with structured responses
 - 🔒 **Thread Safety**: ConcurrentHashMap and atomic operations for concurrent access
@@ -122,7 +119,7 @@ This implementation goes beyond the "few hours" scope with comprehensive enhance
 - 🎯 **Code Quality**: PMD, Checkstyle, Spotless integration
 - 📊 **Performance**: O(1) balance calculation with caching
 
-**Rationale**: While the assignment scope was minimal, these enhancements demonstrate:
+**Rationale**: While the project scope was minimal, these enhancements demonstrate:
 
 - Professional development practices
 - Production-ready code quality
