@@ -2,6 +2,7 @@ package pocket.ledger.exception;
 
 import java.math.BigDecimal;
 import lombok.Getter;
+import pocket.ledger.dto.v1.ErrorCode;
 
 @Getter
 public class InsufficientBalanceException extends BaseBusinessException {

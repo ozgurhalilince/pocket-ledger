@@ -20,12 +20,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import pocket.ledger.dto.v1.BalanceResponseDto;
-import pocket.ledger.dto.v1.PageResponseDto;
+import pocket.ledger.dto.v1.ErrorResponse;
+import pocket.ledger.dto.v1.PageResponse;
+import pocket.ledger.dto.v1.SuccessResponse;
 import pocket.ledger.dto.v1.TransactionQueryDto;
 import pocket.ledger.dto.v1.TransactionRequestDto;
 import pocket.ledger.dto.v1.TransactionResponseDto;
 import pocket.ledger.enums.TransactionType;
-import pocket.ledger.exception.ErrorResponse;
 import pocket.ledger.service.LedgerService;
 import pocket.ledger.util.LedgerConstants;
 import pocket.ledger.util.Page;
@@ -45,13 +46,7 @@ public class LedgerController {
       tags = {"Balance"})
   @ApiResponses(
       value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Balance retrieved successfully",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = BalanceResponseDto.class))),
+        @ApiResponse(responseCode = "200", description = "Balance retrieved successfully"),
         @ApiResponse(
             responseCode = "500",
             description = "Internal server error",
@@ -60,8 +55,8 @@ public class LedgerController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public BalanceResponseDto getBalance() {
-    return ledgerService.getBalance();
+  public SuccessResponse<BalanceResponseDto> getBalance() {
+    return SuccessResponse.ok(ledgerService.getBalance());
   }
 
   @GetMapping("/transactions")
@@ -71,13 +66,7 @@ public class LedgerController {
       tags = {"Transactions"})
   @ApiResponses(
       value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Transactions retrieved successfully",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = PageResponseDto.class))),
+        @ApiResponse(responseCode = "200", description = "Transactions retrieved successfully"),
         @ApiResponse(
             responseCode = "400",
             description = "Invalid query parameters",
@@ -86,7 +75,7 @@ public class LedgerController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public PageResponseDto<TransactionResponseDto> getTransactions(
+  public PageResponse<TransactionResponseDto> getTransactions(
       @Parameter(description = "Page number (0-based)")
           @RequestParam(name = "page", defaultValue = "0")
           int page,
@@ -110,7 +99,7 @@ public class LedgerController {
     Page<TransactionResponseDto> pageResult =
         ledgerService.getTransactions(new TransactionQueryDto(startDate, endDate, type, pageable));
 
-    return new PageResponseDto<>(
+    return new PageResponse<>(
         pageResult.getContent(),
         pageResult.getPageable().getPageNumber(),
         pageResult.getPageable().getPageSize(),
@@ -128,13 +117,7 @@ public class LedgerController {
       tags = {"Transactions"})
   @ApiResponses(
       value = {
-        @ApiResponse(
-            responseCode = "201",
-            description = "Transaction created successfully",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = TransactionResponseDto.class))),
+        @ApiResponse(responseCode = "201", description = "Transaction created successfully"),
         @ApiResponse(
             responseCode = "400",
             description = "Validation failed",
@@ -157,9 +140,10 @@ public class LedgerController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public TransactionResponseDto createTransaction(
+  public SuccessResponse<TransactionResponseDto> createTransaction(
       @Valid @RequestBody TransactionRequestDto request) {
-    return ledgerService.createTransaction(request);
+    TransactionResponseDto transaction = ledgerService.createTransaction(request);
+    return SuccessResponse.ok(transaction, "Transaction created successfully");
   }
 
   @GetMapping("/transactions/{id}")
@@ -169,13 +153,7 @@ public class LedgerController {
       tags = {"Transactions"})
   @ApiResponses(
       value = {
-        @ApiResponse(
-            responseCode = "200",
-            description = "Transaction found",
-            content =
-                @Content(
-                    mediaType = "application/json",
-                    schema = @Schema(implementation = TransactionResponseDto.class))),
+        @ApiResponse(responseCode = "200", description = "Transaction found"),
         @ApiResponse(
             responseCode = "404",
             description = "Transaction not found",
@@ -191,10 +169,11 @@ public class LedgerController {
                     mediaType = "application/json",
                     schema = @Schema(implementation = ErrorResponse.class)))
       })
-  public TransactionResponseDto getTransactionById(
+  public SuccessResponse<TransactionResponseDto> getTransactionById(
       @Parameter(description = "ID of the transaction", required = true) @PathVariable(name = "id")
           Long id) {
 
-    return ledgerService.getTransactionById(id);
+    TransactionResponseDto transaction = ledgerService.getTransactionById(id);
+    return SuccessResponse.ok(transaction);
   }
 }

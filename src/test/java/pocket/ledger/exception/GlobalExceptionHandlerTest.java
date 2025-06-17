@@ -26,6 +26,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import pocket.ledger.dto.v1.ErrorResponse;
 
 @ExtendWith(MockitoExtension.class)
 class GlobalExceptionHandlerTest {
@@ -51,7 +52,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNPROCESSABLE_ENTITY);
-    assertThat(body.getMessage()).contains("Insufficient balance");
+    assertThat(body.message()).contains("Insufficient balance");
   }
 
   @Test
@@ -65,7 +66,7 @@ class GlobalExceptionHandlerTest {
 
     assertAll(
         () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND),
-        () -> assertThat(body.getMessage()).contains("Transaction not found"));
+        () -> assertThat(body.message()).contains("Transaction not found"));
   }
 
   @Test
@@ -94,7 +95,7 @@ class GlobalExceptionHandlerTest {
     assertThat(errorResponse).isNotNull();
     assertAll(
         () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST),
-        () -> assertThat(errorResponse.getMessage()).contains("should be of type"));
+        () -> assertThat(errorResponse.message()).contains("should be of type"));
   }
 
   @Test
@@ -118,7 +119,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    assertThat(body.getMessage()).isEqualTo("Internal server error");
+    assertThat(body.message()).isEqualTo("Internal server error");
   }
 
   @Test
@@ -130,8 +131,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    assertThat(body.getMessage()).isEqualTo("Internal server error");
-    assertThat(body.getPath()).contains("Contact support with Error ID:");
+    assertThat(body.message()).isEqualTo("Internal server error");
   }
 
   @Test
@@ -149,7 +149,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid type for parameter param");
+    assertThat(body.message()).isEqualTo("Invalid type for parameter param");
   }
 
   @Test
@@ -168,8 +168,8 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Validation failed");
-    assertThat(body.getValidationErrors()).isEmpty();
+    assertThat(body.message()).isEqualTo("Validation failed");
+    assertThat(body.validationErrors()).isEmpty();
   }
 
   @Test
@@ -188,8 +188,8 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Validation failed");
-    assertThat(body.getValidationErrors()).containsEntry("fieldName", "Field error message");
+    assertThat(body.message()).isEqualTo("Validation failed");
+    assertThat(body.validationErrors()).containsEntry("fieldName", "Field error message");
   }
 
   @Test
@@ -203,8 +203,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.UNSUPPORTED_MEDIA_TYPE);
-    assertThat(body.getMessage()).isEqualTo("Unsupported media type");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Unsupported media type");
   }
 
   @Test
@@ -222,9 +221,8 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage())
+    assertThat(body.message())
         .isEqualTo("Invalid transaction type. Valid values are: DEPOSIT, WITHDRAWAL");
-    assertThat(body.getPath()).contains("Error ID:");
   }
 
   @Test
@@ -239,8 +237,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid JSON format in request body");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Invalid JSON format in request body");
   }
 
   @Test
@@ -255,8 +252,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid request format");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Invalid request format");
   }
 
   @Test
@@ -271,8 +267,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Valid values are: DEPOSIT, WITHDRAWAL");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Valid values are: DEPOSIT, WITHDRAWAL");
   }
 
   @Test
@@ -287,8 +282,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid transaction type: INVALID");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Invalid transaction type: INVALID");
   }
 
   @Test
@@ -302,8 +296,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid request format");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Invalid request format");
   }
 
   @Test
@@ -318,8 +311,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid JSON format in request body");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Invalid JSON format in request body");
   }
 
   @Test
@@ -334,8 +326,7 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
-    assertThat(body.getMessage()).isEqualTo("Invalid JSON format in request body");
-    assertThat(body.getPath()).contains("Error ID:");
+    assertThat(body.message()).isEqualTo("Invalid JSON format in request body");
   }
 
   @Test
@@ -348,7 +339,6 @@ class GlobalExceptionHandlerTest {
     ErrorResponse body = Objects.requireNonNull(response.getBody());
 
     assertThat(response.getStatusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR);
-    assertThat(body.getMessage()).isEqualTo("Internal server error");
-    assertThat(body.getPath()).contains("Contact support with Error ID:");
+    assertThat(body.message()).isEqualTo("Internal server error");
   }
 }

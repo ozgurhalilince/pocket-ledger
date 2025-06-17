@@ -1,4 +1,4 @@
-package pocket.ledger.exception;
+package pocket.ledger.dto.v1;
 
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -44,9 +44,5 @@ public enum ErrorCode {
     this.code = code;
     this.defaultMessage = defaultMessage;
     this.httpStatus = httpStatus;
-  }
-
-  public String getMessageKey() {
-    return "error." + code.toLowerCase();
   }
 }

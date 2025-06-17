@@ -48,10 +48,6 @@ class LedgerServiceImplTest {
     @Test
     @DisplayName("Should create deposit transaction successfully")
     void shouldCreateDepositTransactionSuccessfully() {
-      TransactionRequestDto request =
-          new TransactionRequestDto(
-              BigDecimal.valueOf(100), TransactionType.DEPOSIT, "Salary deposit");
-
       Transaction savedTransaction =
           new Transaction(BigDecimal.valueOf(100), TransactionType.DEPOSIT, "Salary deposit");
       savedTransaction.setId(1L);
@@ -60,6 +56,9 @@ class LedgerServiceImplTest {
 
       when(transactionRepository.save(any(Transaction.class))).thenReturn(savedTransaction);
 
+      TransactionRequestDto request =
+          new TransactionRequestDto(
+              BigDecimal.valueOf(100), TransactionType.DEPOSIT, "Salary deposit");
       TransactionResponseDto result = ledgerService.createTransaction(request);
 
       assertAll(
@@ -74,10 +73,6 @@ class LedgerServiceImplTest {
     @Test
     @DisplayName("Should create withdrawal transaction when balance is sufficient")
     void shouldCreateWithdrawalTransactionWhenBalanceIsSufficient() {
-      TransactionRequestDto request =
-          new TransactionRequestDto(
-              BigDecimal.valueOf(50), TransactionType.WITHDRAWAL, "ATM withdrawal");
-
       when(transactionRepository.calculateBalance()).thenReturn(BigDecimal.valueOf(100));
 
       Transaction savedTransaction =
@@ -88,6 +83,9 @@ class LedgerServiceImplTest {
 
       when(transactionRepository.save(any(Transaction.class))).thenReturn(savedTransaction);
 
+      TransactionRequestDto request =
+          new TransactionRequestDto(
+              BigDecimal.valueOf(50), TransactionType.WITHDRAWAL, "ATM withdrawal");
       TransactionResponseDto result = ledgerService.createTransaction(request);
 
       assertAll(
@@ -138,9 +136,6 @@ class LedgerServiceImplTest {
     @DisplayName("Should allow withdrawal when amount exactly equals balance")
     void shouldAllowWithdrawalWhenAmountExactlyEqualsBalance() {
       BigDecimal exactBalance = BigDecimal.valueOf(100);
-      TransactionRequestDto request =
-          new TransactionRequestDto(
-              exactBalance, TransactionType.WITHDRAWAL, "Complete withdrawal");
 
       when(transactionRepository.calculateBalance()).thenReturn(exactBalance);
 
@@ -149,6 +144,9 @@ class LedgerServiceImplTest {
       savedTransaction.setId(3L);
       when(transactionRepository.save(any(Transaction.class))).thenReturn(savedTransaction);
 
+      TransactionRequestDto request =
+          new TransactionRequestDto(
+              exactBalance, TransactionType.WITHDRAWAL, "Complete withdrawal");
       TransactionResponseDto result = ledgerService.createTransaction(request);
 
       assertThat(result.amount()).isEqualTo(exactBalance);
@@ -161,10 +159,6 @@ class LedgerServiceImplTest {
       BigDecimal currentBalance = new BigDecimal("100.50");
       BigDecimal withdrawalAmount = new BigDecimal("50.25");
 
-      TransactionRequestDto request =
-          new TransactionRequestDto(
-              withdrawalAmount, TransactionType.WITHDRAWAL, "Partial withdrawal");
-
       when(transactionRepository.calculateBalance()).thenReturn(currentBalance);
 
       Transaction savedTransaction =
@@ -172,6 +166,9 @@ class LedgerServiceImplTest {
       savedTransaction.setId(4L);
       when(transactionRepository.save(any(Transaction.class))).thenReturn(savedTransaction);
 
+      TransactionRequestDto request =
+          new TransactionRequestDto(
+              withdrawalAmount, TransactionType.WITHDRAWAL, "Partial withdrawal");
       TransactionResponseDto result = ledgerService.createTransaction(request);
 
       assertThat(result.amount()).isEqualTo(withdrawalAmount);
@@ -274,12 +271,6 @@ class LedgerServiceImplTest {
     @Test
     @DisplayName("Should delegate to query handler and map results correctly")
     void shouldDelegateToQueryHandlerAndMapResultsCorrectly() {
-      LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0);
-      LocalDateTime endDate = LocalDateTime.of(2024, 1, 31, 23, 59);
-      PageRequest pageRequest = PageRequest.of(0, 10);
-
-      TransactionQueryDto query =
-          new TransactionQueryDto(startDate, endDate, TransactionType.DEPOSIT, pageRequest);
 
       Transaction transaction1 =
           new Transaction(BigDecimal.valueOf(100), TransactionType.DEPOSIT, "Transaction 1");
@@ -291,9 +282,15 @@ class LedgerServiceImplTest {
       transaction2.setId(2L);
       transaction2.setCreatedDate(LocalDateTime.now());
 
+      LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0);
+      LocalDateTime endDate = LocalDateTime.of(2024, 1, 31, 23, 59);
+      PageRequest pageRequest = PageRequest.of(0, 10);
+
       List<Transaction> transactions = List.of(transaction1, transaction2);
       Page<Transaction> transactionPage = new Page<>(transactions, pageRequest, 2);
 
+      TransactionQueryDto query =
+          new TransactionQueryDto(startDate, endDate, TransactionType.DEPOSIT, pageRequest);
       when(queryHandler.executeQuery(query, transactionRepository)).thenReturn(transactionPage);
 
       pocket.ledger.util.Page<TransactionResponseDto> result = ledgerService.getTransactions(query);
@@ -394,9 +391,6 @@ class LedgerServiceImplTest {
     @DisplayName("Should handle transactions with special characters in description")
     void shouldHandleTransactionsWithSpecialCharactersInDescription() {
       String specialDescription = "Café payment €100 - Transaction #123 @user";
-      TransactionRequestDto request =
-          new TransactionRequestDto(
-              BigDecimal.valueOf(100), TransactionType.WITHDRAWAL, specialDescription);
 
       when(transactionRepository.calculateBalance()).thenReturn(BigDecimal.valueOf(200));
 
@@ -405,6 +399,9 @@ class LedgerServiceImplTest {
       savedTransaction.setId(1L);
       when(transactionRepository.save(any(Transaction.class))).thenReturn(savedTransaction);
 
+      TransactionRequestDto request =
+          new TransactionRequestDto(
+              BigDecimal.valueOf(100), TransactionType.WITHDRAWAL, specialDescription);
       TransactionResponseDto result = ledgerService.createTransaction(request);
 
       assertThat(result.description()).isEqualTo(specialDescription);
@@ -432,9 +429,6 @@ class LedgerServiceImplTest {
       BigDecimal currentBalance = new BigDecimal("100.33");
       BigDecimal withdrawalAmount = new BigDecimal("50.17");
 
-      TransactionRequestDto request =
-          new TransactionRequestDto(withdrawalAmount, TransactionType.WITHDRAWAL, "Precision test");
-
       when(transactionRepository.calculateBalance()).thenReturn(currentBalance);
 
       Transaction savedTransaction =
@@ -442,6 +436,8 @@ class LedgerServiceImplTest {
       savedTransaction.setId(1L);
       when(transactionRepository.save(any(Transaction.class))).thenReturn(savedTransaction);
 
+      TransactionRequestDto request =
+          new TransactionRequestDto(withdrawalAmount, TransactionType.WITHDRAWAL, "Precision test");
       TransactionResponseDto result = ledgerService.createTransaction(request);
 
       assertThat(result.amount()).isEqualTo(withdrawalAmount);

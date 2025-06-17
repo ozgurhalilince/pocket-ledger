@@ -1,6 +1,7 @@
 package pocket.ledger.exception;
 
 import lombok.Getter;
+import pocket.ledger.dto.v1.ErrorCode;
 
 @Getter
 public abstract class BaseBusinessException extends RuntimeException {

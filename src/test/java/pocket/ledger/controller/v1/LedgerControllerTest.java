@@ -81,9 +81,9 @@ class LedgerControllerTest {
           .perform(get("/api/v1/balance"))
           .andExpect(status().isOk())
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-          .andExpect(jsonPath("$.balance", is(1500.75)))
-          .andExpect(jsonPath("$.totalTransactions", is(25)))
-          .andExpect(jsonPath("$.asOfTimestamp", is("2024-01-01T10:00:00")));
+          .andExpect(jsonPath("$.data.balance", is(1500.75)))
+          .andExpect(jsonPath("$.data.totalTransactions", is(25)))
+          .andExpect(jsonPath("$.data.asOfTimestamp", is("2024-01-01T10:00:00")));
     }
 
     @Test
@@ -97,8 +97,8 @@ class LedgerControllerTest {
       mockMvc
           .perform(get("/api/v1/balance"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.balance", is(0)))
-          .andExpect(jsonPath("$.totalTransactions", is(0)));
+          .andExpect(jsonPath("$.data.balance", is(0)))
+          .andExpect(jsonPath("$.data.totalTransactions", is(0)));
     }
 
     @Test
@@ -113,8 +113,8 @@ class LedgerControllerTest {
       mockMvc
           .perform(get("/api/v1/balance"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.balance", is(-50.25)))
-          .andExpect(jsonPath("$.totalTransactions", is(5)));
+          .andExpect(jsonPath("$.data.balance", is(-50.25)))
+          .andExpect(jsonPath("$.data.totalTransactions", is(5)));
     }
   }
 
@@ -147,11 +147,11 @@ class LedgerControllerTest {
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isCreated())
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-          .andExpect(jsonPath("$.id", is(1)))
-          .andExpect(jsonPath("$.amount", is(1000)))
-          .andExpect(jsonPath("$.type", is("DEPOSIT")))
-          .andExpect(jsonPath("$.description", is("Initial deposit")))
-          .andExpect(jsonPath("$.createdDate", is("2024-01-01T10:00:00")));
+          .andExpect(jsonPath("$.data.id", is(1)))
+          .andExpect(jsonPath("$.data.amount", is(1000)))
+          .andExpect(jsonPath("$.data.type", is("DEPOSIT")))
+          .andExpect(jsonPath("$.data.description", is("Initial deposit")))
+          .andExpect(jsonPath("$.data.createdDate", is("2024-01-01T10:00:00")));
     }
 
     @Test
@@ -178,9 +178,9 @@ class LedgerControllerTest {
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.id", is(2)))
-          .andExpect(jsonPath("$.amount", is(250.5)))
-          .andExpect(jsonPath("$.type", is("WITHDRAWAL")));
+          .andExpect(jsonPath("$.data.id", is(2)))
+          .andExpect(jsonPath("$.data.amount", is(250.5)))
+          .andExpect(jsonPath("$.data.type", is("WITHDRAWAL")));
     }
 
     @Test
@@ -249,8 +249,7 @@ class LedgerControllerTest {
           .andExpect(
               jsonPath("$.message")
                   .value(org.hamcrest.Matchers.containsString("Insufficient balance")))
-          .andExpect(jsonPath("$.status", is(422)))
-          .andExpect(jsonPath("$.path").value(org.hamcrest.Matchers.startsWith("Error ID:")));
+          .andExpect(jsonPath("$.status", is(422)));
     }
 
     @Test
@@ -276,7 +275,7 @@ class LedgerControllerTest {
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.description", is("")));
+          .andExpect(jsonPath("$.data.description", is("")));
     }
 
     @Test
@@ -304,7 +303,7 @@ class LedgerControllerTest {
                   .contentType(MediaType.APPLICATION_JSON)
                   .content(objectMapper.writeValueAsString(request)))
           .andExpect(status().isCreated())
-          .andExpect(jsonPath("$.description", is(longDescription)));
+          .andExpect(jsonPath("$.data.description", is(longDescription)));
     }
 
     @Test
@@ -348,10 +347,10 @@ class LedgerControllerTest {
           .perform(get("/api/v1/transactions/{id}", transactionId))
           .andExpect(status().isOk())
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-          .andExpect(jsonPath("$.id", is(1)))
-          .andExpect(jsonPath("$.amount", is(500)))
-          .andExpect(jsonPath("$.type", is("DEPOSIT")))
-          .andExpect(jsonPath("$.description", is("Test transaction")));
+          .andExpect(jsonPath("$.data.id", is(1)))
+          .andExpect(jsonPath("$.data.amount", is(500)))
+          .andExpect(jsonPath("$.data.type", is("DEPOSIT")))
+          .andExpect(jsonPath("$.data.description", is("Test transaction")));
     }
 
     @Test
@@ -367,8 +366,7 @@ class LedgerControllerTest {
           .andExpect(
               jsonPath("$.message")
                   .value(org.hamcrest.Matchers.containsString("Transaction not found")))
-          .andExpect(jsonPath("$.status", is(404)))
-          .andExpect(jsonPath("$.path").value(org.hamcrest.Matchers.startsWith("Error ID:")));
+          .andExpect(jsonPath("$.status", is(404)));
     }
 
     @Test
@@ -440,11 +438,11 @@ class LedgerControllerTest {
           .perform(get("/api/v1/transactions"))
           .andExpect(status().isOk())
           .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-          .andExpect(jsonPath("$.content", hasSize(2)))
-          .andExpect(jsonPath("$.content[0].id", is(1)))
-          .andExpect(jsonPath("$.content[0].amount", is(100)))
-          .andExpect(jsonPath("$.content[1].id", is(2)))
-          .andExpect(jsonPath("$.content[1].amount", is(50)))
+          .andExpect(jsonPath("$.data", hasSize(2)))
+          .andExpect(jsonPath("$.data[0].id", is(1)))
+          .andExpect(jsonPath("$.data[0].amount", is(100)))
+          .andExpect(jsonPath("$.data[1].id", is(2)))
+          .andExpect(jsonPath("$.data[1].amount", is(50)))
           .andExpect(jsonPath("$.pageNumber", is(0)))
           .andExpect(jsonPath("$.pageSize", is(10)))
           .andExpect(jsonPath("$.totalElements", is(2)))
@@ -473,7 +471,7 @@ class LedgerControllerTest {
       mockMvc
           .perform(get("/api/v1/transactions").param("page", "1").param("size", "5"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content", hasSize(1)))
+          .andExpect(jsonPath("$.data", hasSize(1)))
           .andExpect(jsonPath("$.pageNumber", is(1)))
           .andExpect(jsonPath("$.pageSize", is(5)))
           .andExpect(jsonPath("$.totalElements", is(10)))
@@ -501,8 +499,8 @@ class LedgerControllerTest {
       mockMvc
           .perform(get("/api/v1/transactions").param("type", "DEPOSIT"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content", hasSize(1)))
-          .andExpect(jsonPath("$.content[0].type", is("DEPOSIT")));
+          .andExpect(jsonPath("$.data", hasSize(1)))
+          .andExpect(jsonPath("$.data[0].type", is("DEPOSIT")));
     }
 
     @Test
@@ -528,7 +526,7 @@ class LedgerControllerTest {
                   .param("startDate", "2024-01-01T00:00:00")
                   .param("endDate", "2024-01-31T23:59:59"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content", hasSize(1)));
+          .andExpect(jsonPath("$.data", hasSize(1)));
     }
 
     @Test
@@ -540,7 +538,7 @@ class LedgerControllerTest {
       mockMvc
           .perform(get("/api/v1/transactions").param("type", "WITHDRAWAL"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content", hasSize(0)))
+          .andExpect(jsonPath("$.data", hasSize(0)))
           .andExpect(jsonPath("$.totalElements", is(0)));
     }
 
@@ -583,7 +581,7 @@ class LedgerControllerTest {
       mockMvc
           .perform(get("/api/v1/transactions").param("page", "-1"))
           .andExpect(status().isOk())
-          .andExpect(jsonPath("$.content", hasSize(0)));
+          .andExpect(jsonPath("$.data", hasSize(0)));
     }
 
     @Test

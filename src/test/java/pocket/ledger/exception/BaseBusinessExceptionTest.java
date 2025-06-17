@@ -3,6 +3,7 @@ package pocket.ledger.exception;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
+import pocket.ledger.dto.v1.ErrorCode;
 
 class BaseBusinessExceptionTest {
 

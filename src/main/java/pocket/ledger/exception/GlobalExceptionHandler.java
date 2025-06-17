@@ -1,6 +1,5 @@
 package pocket.ledger.exception;
 
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -16,13 +15,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import pocket.ledger.dto.v1.ErrorResponse;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-
-  private static final String ERROR_ID_PREFIX = "Error ID: ";
-  private static final String CONTACT_SUPPORT_PREFIX = "Contact support with Error ID: ";
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<ErrorResponse> handleValidationExceptions(
@@ -68,6 +65,7 @@ public class GlobalExceptionHandler {
         ex.getRequestedAmount());
     ErrorResponse errorResponse =
         createErrorResponse(ex.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
@@ -80,6 +78,7 @@ public class GlobalExceptionHandler {
     log.error("Transaction not found error [{}]: {} at {}", errorId, ex.getMessage(), requestUri);
     ErrorResponse errorResponse =
         createErrorResponse(ex.getMessage(), HttpStatus.NOT_FOUND, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
   }
 
@@ -90,6 +89,7 @@ public class GlobalExceptionHandler {
     log.error("Illegal argument error [{}]: {}", errorId, ex.getMessage());
     ErrorResponse errorResponse =
         createErrorResponse(ex.getMessage(), HttpStatus.BAD_REQUEST, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
@@ -132,6 +132,7 @@ public class GlobalExceptionHandler {
 
     ErrorResponse errorResponse =
         createErrorResponse(errorMessage, HttpStatus.BAD_REQUEST, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
@@ -147,6 +148,7 @@ public class GlobalExceptionHandler {
     log.info("Type mismatch error [{}]: {}", errorId, errorMessage);
     ErrorResponse errorResponse =
         createErrorResponse(errorMessage, HttpStatus.BAD_REQUEST, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
   }
 
@@ -159,6 +161,7 @@ public class GlobalExceptionHandler {
     log.info("Unsupported media type error [{}]: {} at {}", errorId, ex.getMessage(), requestUri);
     ErrorResponse errorResponse =
         createErrorResponse("Unsupported media type", HttpStatus.UNSUPPORTED_MEDIA_TYPE, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
   }
 
@@ -175,7 +178,8 @@ public class GlobalExceptionHandler {
         ex.getRequestURL(),
         requestUri);
     ErrorResponse errorResponse =
-        createErrorResponse("Endpoint not found", HttpStatus.NOT_FOUND, errorId);
+        createErrorResponse("Endpoint not found!", HttpStatus.NOT_FOUND, errorId);
+
     return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
   }
 
@@ -194,8 +198,7 @@ public class GlobalExceptionHandler {
         ex);
 
     ErrorResponse errorResponse =
-        createErrorResponseWithContactSupport(
-            "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR, errorId);
+        createErrorResponse("Internal server error", HttpStatus.INTERNAL_SERVER_ERROR, errorId);
 
     return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
   }
@@ -205,19 +208,11 @@ public class GlobalExceptionHandler {
   }
 
   private ErrorResponse createErrorResponse(String message, HttpStatus status, String errorId) {
-    return new ErrorResponse(
-        message, status.value(), LocalDateTime.now(), ERROR_ID_PREFIX + errorId);
+    return ErrorResponse.of(message, status.value(), errorId);
   }
 
   private ErrorResponse createErrorResponseWithValidation(
       String message, HttpStatus status, String errorId, Map<String, String> validationErrors) {
-    return new ErrorResponse(
-        message, status.value(), LocalDateTime.now(), ERROR_ID_PREFIX + errorId, validationErrors);
-  }
-
-  private ErrorResponse createErrorResponseWithContactSupport(
-      String message, HttpStatus status, String errorId) {
-    return new ErrorResponse(
-        message, status.value(), LocalDateTime.now(), CONTACT_SUPPORT_PREFIX + errorId);
+    return ErrorResponse.of(message, status.value(), errorId, validationErrors);
   }
 }
