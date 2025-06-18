@@ -37,15 +37,22 @@ public class DataSeedComponent implements CommandLineRunner {
           (type == TransactionType.DEPOSIT) ? randomAmount(200, 3000) : randomAmount(5, 500);
 
       String description = faker.commerce().productName();
-      createTransaction(amount, type, description);
+      createTransaction(1L, 2L, amount, type, description);
     }
 
     log.info("Seeding completed.");
   }
 
-  private void createTransaction(BigDecimal amount, TransactionType type, String description) {
+  private void createTransaction(
+      Long sourceAccountId,
+      Long destionationAccountId,
+      BigDecimal amount,
+      TransactionType type,
+      String description) {
     try {
-      ledgerService.createTransaction(new TransactionRequestDto(amount, type, description));
+      ledgerService.createTransaction(
+          new TransactionRequestDto(
+              sourceAccountId, destionationAccountId, amount, type, description));
     } catch (Exception e) {
       log.warn("Failed to create transaction: {} - {}", type, amount, e);
     }

@@ -11,6 +11,16 @@ import pocket.ledger.model.Transaction;
 
 @Schema(description = "Request to create a new transaction")
 public record TransactionRequestDto(
+    @Schema(
+            description = "Optional description for the transaction",
+            example = "Monthly salary",
+            maxLength = 255)
+        Long sourceAccountId,
+    @Schema(
+            description = "Optional description for the transaction",
+            example = "Monthly salary",
+            maxLength = 255)
+        Long destinationAccountId,
     @Schema(description = "Transaction amount", example = "100.50", required = true)
         @NotNull(message = "Amount is required")
         @DecimalMin(value = "0.01", message = "Amount must be greater than 0")
@@ -33,6 +43,6 @@ public record TransactionRequestDto(
         String description) {
 
   public Transaction toEntity() {
-    return new Transaction(amount, type, description);
+    return new Transaction(sourceAccountId, destinationAccountId, amount, type, description);
   }
 }
