@@ -1,0 +1,29 @@
+#!/bin/bash
+
+echo "Running pre-commit checks..."
+
+# Run code formatting check
+echo "Checking code format..."
+./gradlew spotlessCheck
+if [ $? -ne 0 ]; then
+    echo "❌ Code format check failed. Run './gradlew spotlessApply' to fix."
+    exit 1
+fi
+
+# Run tests
+echo "Running tests..."
+./gradlew test
+if [ $? -ne 0 ]; then
+    echo "❌ Tests failed. Please fix failing tests before committing."
+    exit 1
+fi
+
+# Run static analysis
+echo "Running static analysis..."
+./gradlew pmdMain checkstyleMain
+if [ $? -ne 0 ]; then
+    echo "❌ Static analysis failed. Please fix code quality issues."
+    exit 1
+fi
+
+echo "✅ All pre-commit checks passed!"

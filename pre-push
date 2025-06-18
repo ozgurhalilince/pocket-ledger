@@ -1,0 +1,12 @@
+#!/bin/bash
+
+echo "Running pre-push checks..."
+
+# Run full quality check
+./gradlew qualityCheck
+if [ $? -ne 0 ]; then
+    echo "❌ Quality checks failed. Please fix all issues before pushing."
+    exit 1
+fi
+
+echo "✅ All pre-push checks passed!"
